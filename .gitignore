@@ -1,3 +1,4 @@
 .haxelib
-
+.envrc
 run.js
+node_modules

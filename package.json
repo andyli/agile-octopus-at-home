@@ -1,0 +1,14 @@
+{
+  "name": "agile-octopus-at-home",
+  "version": "0.0.0",
+  "description": "",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andy Li <andy@onthewings.net>",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

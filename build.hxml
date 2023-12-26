@@ -1,6 +1,7 @@
 --js run.js
 --class-path src
 --library hxnodejs
+--library node-fetch
 --main Run
 --define no-deprecation-warnings
 --dce full

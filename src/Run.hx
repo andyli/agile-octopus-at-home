@@ -52,6 +52,21 @@ class Run {
                 cmd("C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", ["--send-command", "shutdown"]);
                 File.saveContent(logFile, "stop");
                 Schtasks.delete(taskName, {force: true});
+            case ["getProducts"]:
+                new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))
+                    .getProducts()
+                    .then(o -> trace(o));
+            case ["getElectricityStandardUnitRates"]:
+                new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))
+                    .getElectricityStandardUnitRates(
+                        Sys.getEnv("OCTOPUS_ENERGY_PRODUCT_CODE"),
+                        Sys.getEnv("OCTOPUS_ENERGY_TARIFF_CODE"),
+                        {
+                            periodFrom: Date.now(),
+                            periodTo: Date.now().delta(DateTools.hours(1)),
+                        }
+                    )
+                    .then(o -> trace(o));
             case _:
                 throw "unexpected args";
         }

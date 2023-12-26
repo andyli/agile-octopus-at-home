@@ -9,6 +9,7 @@
   "author": "Andy Li <andy@onthewings.net>",
   "license": "CC0-1.0",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "node-fetch": "^2.7.0"
   }
 }

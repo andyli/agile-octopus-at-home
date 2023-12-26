@@ -11,12 +11,9 @@ enum TaskType {
 
 class Run {
     static function cmd(command:String, args:Array<String>):Void {
-        final process = new Process(command, args);
-        final output = process.stdout.readAll().toString();
-        final error = process.stderr.readAll().toString();
-        final exitCode = process.exitCode();
+        final exitCode = Sys.command(command, args);
         if (exitCode != 0) {
-            throw '${command} failed with exit code ${exitCode}:\n${error}\n${output}';
+            throw '${command} failed with exit code ${exitCode}';
         }
     }
 
@@ -32,6 +29,15 @@ class Run {
             startDate: date.format("%Y-%m-%d"),
             startTime: date.format("%H:%M"),
         });
+    }
+
+    static function start():Void {
+        cmd("C:\\Program Files (x86)\\FAHClient\\HideConsole.exe", ["C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", "--chdir", "C:\\ProgramData\\FAHClient"]);
+        cmd("C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", ["--send-unpause"]);
+    }
+
+    static function stop():Void {
+        cmd("C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", ["--send-command", "shutdown"]);
     }
 
     static function main():Void {
@@ -50,14 +56,19 @@ class Run {
             case ["test-run", taskName]:
                 File.saveContent(logFile, "test-run");
                 Schtasks.delete(taskName, {force: true});
-            case ["start", taskName]:
-                cmd("C:\\Program Files (x86)\\FAHClient\\HideConsole.exe", ['"C:\\Program Files (x86)\\FAHClient\\FAHClient.exe" --chdir C:\\ProgramData\\FAHClient']);
-                cmd("C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", ["--send-unpause"]);
+            case ["start"]:
+                start();
                 File.saveContent(logFile, "start");
+            case ["start", taskName]:
+                start();
+                File.saveContent(logFile, "start " + taskName);
                 Schtasks.delete(taskName, {force: true});
-            case ["stop", taskName]:
-                cmd("C:\\Program Files (x86)\\FAHClient\\FAHClient.exe", ["--send-command", "shutdown"]);
+            case ["stop"]:
+                stop();
                 File.saveContent(logFile, "stop");
+            case ["stop", taskName]:
+                stop();
+                File.saveContent(logFile, "stop" + taskName);
                 Schtasks.delete(taskName, {force: true});
             case ["getProducts"]:
                 new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))

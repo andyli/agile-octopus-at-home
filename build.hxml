@@ -2,6 +2,7 @@
 --class-path src
 --library hxnodejs
 --library node-fetch
+--library CommentString
 --main Run
 --define no-deprecation-warnings
 --dce full

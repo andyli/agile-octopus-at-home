@@ -30,6 +30,18 @@ class Run {
         **/, " ")]);
     }
 
+    static function scheduleRunDaily(name:String, ?args:Array<String>):Void {
+        final scriptDir = Path.directory(Sys.programPath());
+        final taskRunner = scriptDir + "\\task-runner.vbs";
+        cmd("powershell.exe", ["-noprofile", "-command", ~/\r?\n/g.replace(comment(unindent, format)/**
+            Register-ScheduledTask
+            -TaskName "${name}"
+            -Trigger (New-ScheduledTaskTrigger -Daily -At 8pm)
+            -Settings (New-ScheduledTaskSettingsSet -WakeToRun)
+            -Action (New-ScheduledTaskAction -Execute "${taskRunner}" -Argument "${args.join(" ")}")
+        **/, " ")]);
+    }
+
     static function deleteTask(name:String):Void {
         cmd("powershell.exe", ["-noprofile", "-command", ~/\r?\n/g.replace(comment(unindent, format)/**
             Unregister-ScheduledTask -TaskName "${name}" -Confirm:$$false
@@ -80,7 +92,7 @@ class Run {
                 File.saveContent(logFile, "stop");
             case ["stop", taskName]:
                 stop();
-                File.saveContent(logFile, "stop" + taskName);
+                File.saveContent(logFile, "stop " + taskName);
                 deleteTask(taskName);
             case ["getProducts"]:
                 new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))
@@ -97,6 +109,9 @@ class Run {
                         }
                     )
                     .then(o -> trace(o));
+            
+            case ["schedule-daily"]:
+                scheduleRunDaily("agile-octopus-at-home-daily", ["schedule-next-day"]);
             case ["schedule-next-day"]:
                 final now = Date.now();
                 new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))

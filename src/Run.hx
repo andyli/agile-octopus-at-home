@@ -99,13 +99,14 @@ class Run {
                     .getProducts()
                     .then(o -> trace(o));
             case ["getElectricityStandardUnitRates"]:
+                final now = Date.now();
                 new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))
                     .getElectricityStandardUnitRates(
                         Sys.getEnv("OCTOPUS_ENERGY_PRODUCT_CODE"),
                         Sys.getEnv("OCTOPUS_ENERGY_TARIFF_CODE"),
                         {
-                            periodFrom: Date.now(),
-                            periodTo: Date.now().delta(DateTools.hours(1)),
+                            periodFrom: now,
+                            periodTo: now.delta(DateTools.days(1)),
                         }
                     )
                     .then(o -> trace(o));

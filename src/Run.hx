@@ -24,7 +24,7 @@ class Run {
         cmd("powershell.exe", ["-noprofile", "-command", ~/\r?\n/g.replace(comment(unindent, format)/**
             Register-ScheduledTask
             -TaskName "${name}"
-            -Trigger (New-ScheduledTaskTrigger -At (([System.DateTimeOffset]::FromUnixTimeMilliseconds(${date.getTime()})).DateTime) -Once)
+            -Trigger (New-ScheduledTaskTrigger -At (([System.DateTimeOffset]::FromUnixTimeMilliseconds(${date.getTime()})).LocalDateTime) -Once)
             -Settings (New-ScheduledTaskSettingsSet -WakeToRun)
             -Action (New-ScheduledTaskAction -Execute "${taskRunner}" -Argument "${args.join(" ")}")
         **/, " ")]);

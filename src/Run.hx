@@ -11,6 +11,16 @@ enum TaskType {
 }
 
 class Run {
+    static final taskRunner:String = {
+        var scriptDir = Path.directory(Sys.programPath());
+        // convert wsl path to windows path, because Task Scheduler can't handle wsl path
+        final r = ~/^\/mnt\/([A-Za-z])\/(.+)$/;
+        if (r.match(scriptDir)) {
+            scriptDir = Path.join([r.matched(1).toUpperCase() + ":\\", r.matched(2)]);
+        }
+        Path.join([scriptDir, "task-runner.vbs"]);
+    }
+
     static function cmd(command:String, args:Array<String>):Void {
         final exitCode = Sys.command(command, args);
         if (exitCode != 0) {
@@ -19,8 +29,6 @@ class Run {
     }
 
     static function scheduleRunOnce(date:Date, name:String, ?args:Array<String>):Void {
-        final scriptDir = Path.directory(Sys.programPath());
-        final taskRunner = scriptDir + "\\task-runner.vbs";
         cmd("powershell.exe", ["-noprofile", "-command", ~/\r?\n/g.replace(comment(unindent, format)/**
             Register-ScheduledTask
             -TaskName "${name}"
@@ -31,8 +39,6 @@ class Run {
     }
 
     static function scheduleRunDaily(name:String, ?args:Array<String>):Void {
-        final scriptDir = Path.directory(Sys.programPath());
-        final taskRunner = scriptDir + "\\task-runner.vbs";
         cmd("powershell.exe", ["-noprofile", "-command", ~/\r?\n/g.replace(comment(unindent, format)/**
             Register-ScheduledTask
             -TaskName "${name}"
@@ -58,8 +64,7 @@ class Run {
     }
 
     static function main():Void {
-        final scriptDir = Path.directory(Sys.programPath());
-        Sys.setCwd(scriptDir);
+        Sys.setCwd(Path.directory(Sys.programPath()));
         js.Lib.require('dotenv').config();
         final logFile = Path.join(["logs", Date.now().format("%Y-%m-%d_%H-%M-%S") + ".log"]);
         switch (Sys.args()) {

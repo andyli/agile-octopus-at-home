@@ -113,6 +113,13 @@ class Run {
             
             case ["schedule-daily"]:
                 scheduleRunDaily("agile-octopus-at-home-daily", ["schedule-next-day"]);
+            case ["schedule-period", startTime, endTime]:
+                final start = Date.fromString(startTime);
+                final end = Date.fromString(endTime);
+                final taskName = "agile-octopus-at-home_" + start.format("%Y-%m-%d_%H-%M") + "_start";
+                scheduleRunOnce(start, taskName, ["start", taskName]);
+                final taskName = "agile-octopus-at-home_" + end.format("%Y-%m-%d_%H-%M") + "_stop";
+                scheduleRunOnce(end, taskName, ["stop", taskName]);
             case ["schedule-next-day"]:
                 final now = Date.now();
                 new OctopusEnergyApi(Sys.getEnv("OCTOPUS_ENERGY_API_KEY"))
